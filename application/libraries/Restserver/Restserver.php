@@ -202,7 +202,7 @@ class Restserver {
 		}
         		
         // Authentification
-        if ($this->_auth() === FALSE) {_auth
+        if ($this->_auth() === FALSE) {
             return $this->response(array(
                 'status' => FALSE,
                 'error' => 'Authorization failed'

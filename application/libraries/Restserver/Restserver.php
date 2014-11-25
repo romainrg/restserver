@@ -4,7 +4,7 @@
  * Restserver (Librairie REST Serveur)
  * @author Yoann VANITOU
  * @license http://opensource.org/licenses/gpl-license.php GNU Public License
- * @version 1.0.3 (20141120)
+ * @version 1.0.4 (20141125)
  */
 class Restserver {
 
@@ -18,7 +18,7 @@ class Restserver {
      * Version
      * @var string
      */
-    protected $version = '1.0.3 (20141120)';
+    protected $version = '1.0.4 (20141125)';
 
     /**
      * Configuration
@@ -48,6 +48,12 @@ class Restserver {
         'error' => NULL,
         'value' => NULL
     );
+    
+    /**
+     * Instance du controlleur
+     * @var CI_Controller
+     */
+    protected $controller;
     
     /**
      * La méthode
@@ -159,6 +165,7 @@ class Restserver {
      */
     public function run(CI_Controller &$controller, $call, $params) {
         // Collecte les données
+        $this->controller =& $controller;
         $this->method = $this->_get_method();
         $this->url = $this->_get_url();
         $this->ip = $this->_get_ip();
@@ -195,15 +202,23 @@ class Restserver {
 		}
         		
         // Authentification
-        if ($this->_auth() === FALSE) {
+        if ($this->_auth() === FALSE) {_auth
             return $this->response(array(
                 'status' => FALSE,
                 'error' => 'Authorization failed'
             ), 401);
         }
+        
+        // Droits
+        if ($this->_right() === FALSE) {
+            return $this->response(array(
+                'status' => FALSE,
+                'error' => 'No rights'
+            ), 401);
+        }
                 
         // Si la méthode existe
-        if ( ! method_exists($controller, $this->method)) {
+        if ( ! method_exists($this->controller, $this->method)) {
             return $this->response(array(
                 'status' => FALSE,
                 'error' => 'Method not found'
@@ -251,7 +266,7 @@ class Restserver {
         
         // Exécute la méthode
         try {
-            call_user_func_array(array($controller, $this->method), $params);
+            call_user_func_array(array($this->controller, $this->method), $params);
         } catch (Exception $error) {
             $this->response(array(
                 'status' => FALSE,
@@ -532,13 +547,30 @@ class Restserver {
      * @return boolean
      */
     private function _auth() {
-        // Si l'autentification par HTTP est activé
-        if ($this->config['auth_http'] && $this->_auth_login($this->username, $this->password, $this->ip) === FALSE)
-            return FALSE;
-                
+        // Si l'autentification par HTTP est activé et qu'il existe une surcharge
+        if ($this->config['auth_http'] && method_exists($this->controller, '_auth_login')) {
+            return call_user_func_array(array($this->controller, '_auth_login'), array(
+                $this->username,
+                $this->password,
+                $this->ip
+            ));
+            
+        // Si l'autentification par HTTP est activé et qu'il n'existe pas de surcharge
+        } else if ($this->config['auth_http']) {
+            return $this->_auth_login($this->username, $this->password, $this->ip);
+        }
+        
+        return TRUE;
+    }
+    
+    /**
+     * Right
+     * @return boolean
+     */
+    private function _right() {
         // Si l'autentification par clé api est activé
-        if ($this->config['auth_api'] && $this->_auth_api($this->key) === FALSE)
-            return FALSE;
+        if ($this->config['auth_api'])
+            return $this->_auth_api($this->key);
         
         return TRUE;
     }
@@ -580,7 +612,7 @@ class Restserver {
     }
     
     /**
-     * Authentification par token
+     * Authentification par api
      * @return boolean
      */
     private function _auth_api() {

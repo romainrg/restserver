@@ -4,7 +4,7 @@
  * Restserver (Librairie REST Serveur)
  * @author Yoann VANITOU
  * @license http://opensource.org/licenses/gpl-license.php GNU Public License
- * @version 1.0.3 (20141120)
+ * @version 1.0.4 (20141125)
  */
 require_once(__DIR__.'/Restserver/Restserver.php');
 require_once(__DIR__.'/Restserver/Restserver_field.php');

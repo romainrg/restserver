@@ -13,7 +13,6 @@ $config['restserver'] = array(
     'force_https' => FALSE,
     'ajax_only' => FALSE,
     'auth_http' => FALSE,
-    'auth_api' => FALSE,
     'log' => TRUE,
     'log_driver' => 'database',
     'log_path' => "",

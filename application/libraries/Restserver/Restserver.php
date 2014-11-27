@@ -31,7 +31,6 @@ class Restserver {
         'force_https' => FALSE,
         'ajax_only' => FALSE,
         'auth_http' => FALSE,
-        'auth_api' => FALSE,
         'cache' => FALSE,
         'log' => FALSE,
         'log_driver' => 'file',
@@ -206,14 +205,6 @@ class Restserver {
             return $this->response(array(
                 'status' => FALSE,
                 'error' => 'Authorization failed'
-            ), 401);
-        }
-        
-        // Droits
-        if ($this->_right() === FALSE) {
-            return $this->response(array(
-                'status' => FALSE,
-                'error' => 'No rights'
             ), 401);
         }
                 
@@ -486,26 +477,10 @@ class Restserver {
     private function _get_username_password() {
         $username = $this->CI->input->server('PHP_AUTH_USER');
         $password = $this->CI->input->server('PHP_AUTH_PW');
-        $authentication = $this->CI->input->server('HTTP_AUTHENTICATION');
-        $authorization = $this->CI->input->server('HTTP_AUTHORIZATION');
-        
-        if ( ! empty($authentication) && ! empty($authorization)) {
-            if (strpos(strtolower($authentication), 'basic') === 0)
-                list($username, $password) = explode(':', base64_decode(substr($authorization, 6)));
-        }
         
         return array('username' => (string)$username, 'password' => (string)$password);
     }
-        
-    /**
-     * Retourne le token
-     * @return string
-     */
-    private function _get_key() {
-        $key = $this->CI->input->server('HTTP_KEY');
-        return ( ! empty($key)) ? $key : '';
-    }
-    
+            
     /**
      * Retourne la liste des en-têtes
      * @return array
@@ -562,19 +537,7 @@ class Restserver {
         
         return TRUE;
     }
-    
-    /**
-     * Right
-     * @return boolean
-     */
-    private function _right() {
-        // Si l'autentification par clé api est activé
-        if ($this->config['auth_api'])
-            return $this->_auth_api($this->key);
         
-        return TRUE;
-    }
-    
     /**
      * Authentification par nom d'utilisateur et mot de passe
      * @param string $username
@@ -610,30 +573,7 @@ class Restserver {
         // Si l'identification est incorrecte
         return FALSE;
     }
-    
-    /**
-     * Authentification par api
-     * @return boolean
-     */
-    private function _auth_api() {
-        // Si la clé est vide
-        if (empty($this->key))
-            return FALSE;
         
-        // Intéroge la base de donnée
-        $api_model = new \rest\api_model();
-        $api = $api_model->where(array(
-            'key' => $this->key,
-            'status' => 1,
-        ))->find_one();
-        
-        // Si l'identifiacation est correcte
-        if ( ! empty($api))
-            return TRUE;
-        
-        return FALSE;
-    }
-    
     /**
      * Retourne les règles
      * @return array

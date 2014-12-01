@@ -477,10 +477,17 @@ class Restserver {
     private function _get_username_password() {
         $username = $this->CI->input->server('PHP_AUTH_USER');
         $password = $this->CI->input->server('PHP_AUTH_PW');
+        $authorization = $this->CI->input->server('REDIRECT_HTTP_AUTHORIZATION');
+        
+        // Si l'entete authorization est envoyé
+        try {
+            if ( ! empty($authorization))
+                list($username, $password) = explode(':', base64_decode(substr($authorization, 6)));
+        } catch (Exception $e) { }
         
         return array('username' => (string)$username, 'password' => (string)$password);
     }
-            
+    
     /**
      * Retourne la liste des en-têtes
      * @return array

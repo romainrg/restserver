@@ -4,7 +4,7 @@
  * Restserver (Librairie REST Serveur)
  * @author Yoann VANITOU
  * @license http://opensource.org/licenses/gpl-license.php GNU Public License
- * @version 1.0.4 (20141125)
+ * @version 1.0.5 (20141212)
  */
 class Exemple extends Restserver_Controller {
 

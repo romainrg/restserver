@@ -4,7 +4,7 @@
  * Restserver (Librairie REST Serveur)
  * @author Yoann VANITOU
  * @license http://opensource.org/licenses/gpl-license.php GNU Public License
- * @version 1.0.4 (20141125)
+ * @version 1.0.5 (20141212)
  */
 class Restserver {
 
@@ -18,7 +18,7 @@ class Restserver {
      * Version
      * @var string
      */
-    protected $version = '1.0.4 (20141125)';
+    protected $version = '1.0.5 (20141212)';
 
     /**
      * Configuration
@@ -31,6 +31,7 @@ class Restserver {
         'force_https' => FALSE,
         'ajax_only' => FALSE,
         'auth_http' => FALSE,
+        'auth_api' => FALSE,
         'cache' => FALSE,
         'log' => FALSE,
         'log_driver' => 'file',
@@ -207,6 +208,14 @@ class Restserver {
                 'error' => 'Authorization failed'
             ), 401);
         }
+        
+        // Droits
+        if ($this->_right() === FALSE) {
+            return $this->response(array(
+                'status' => FALSE,
+                'error' => 'No rights'
+            ), 401);
+        }
                 
         // Si la méthode existe
         if ( ! method_exists($this->controller, $this->method)) {
@@ -287,15 +296,10 @@ class Restserver {
     
     /**
      * Obtenir une ou plusieurs alias
-     * @param string|NULL $key
-     * @param string $namespace
-     * @return type
+     * @return array
      */
-    public function alias($key = NULL, $namespace = 'default') {
-        if ($key !== NULL)
-            return (isset($this->alias[$namespace][$key])) ? $this->alias[$namespace][$key] : FALSE;
-        
-        return ( ! empty($namespace)) ? $this->alias[$namespace] : $this->alias;
+    public function alias() {
+        return $this->alias;
     }
         
     /**
@@ -477,15 +481,24 @@ class Restserver {
     private function _get_username_password() {
         $username = $this->CI->input->server('PHP_AUTH_USER');
         $password = $this->CI->input->server('PHP_AUTH_PW');
-        $authorization = $this->CI->input->server('REDIRECT_HTTP_AUTHORIZATION');
+        $authentication = $this->CI->input->server('HTTP_AUTHENTICATION');
+        $authorization = $this->CI->input->server('HTTP_AUTHORIZATION');
         
-        // Si l'entete authorization est envoyé
-        try {
-            if ( ! empty($authorization))
+        if ( ! empty($authentication) && ! empty($authorization)) {
+            if (strpos(strtolower($authentication), 'basic') === 0)
                 list($username, $password) = explode(':', base64_decode(substr($authorization, 6)));
-        } catch (Exception $e) { }
+        }
         
         return array('username' => (string)$username, 'password' => (string)$password);
+    }
+        
+    /**
+     * Retourne le token
+     * @return string
+     */
+    private function _get_key() {
+        $key = $this->CI->input->server('HTTP_KEY');
+        return ( ! empty($key)) ? $key : '';
     }
     
     /**
@@ -544,7 +557,19 @@ class Restserver {
         
         return TRUE;
     }
+    
+    /**
+     * Right
+     * @return boolean
+     */
+    private function _right() {
+        // Si l'autentification par clé api est activé
+        if ($this->config['auth_api'])
+            return $this->_auth_api($this->key);
         
+        return TRUE;
+    }
+    
     /**
      * Authentification par nom d'utilisateur et mot de passe
      * @param string $username
@@ -580,7 +605,30 @@ class Restserver {
         // Si l'identification est incorrecte
         return FALSE;
     }
+    
+    /**
+     * Authentification par api
+     * @return boolean
+     */
+    private function _auth_api() {
+        // Si la clé est vide
+        if (empty($this->key))
+            return FALSE;
         
+        // Intéroge la base de donnée
+        $api_model = new \rest\api_model();
+        $api = $api_model->where(array(
+            'key' => $this->key,
+            'status' => 1,
+        ))->find_one();
+        
+        // Si l'identifiacation est correcte
+        if ( ! empty($api))
+            return TRUE;
+        
+        return FALSE;
+    }
+    
     /**
      * Retourne les règles
      * @return array
@@ -637,7 +685,7 @@ class Restserver {
                         }
                         
                         // Création des espaces de nom
-                        $alias = array_merge_recursive($alias, namespace_recursive(explode('.', $value), $input_value));
+                        $alias = array_replace_recursive($alias, $this->_namespace_recursive(explode('.', $value), $input_value));
                     }
                 }
             }

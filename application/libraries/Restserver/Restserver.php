@@ -145,12 +145,12 @@ class Restserver {
     
     /**
      * Exécute la routine
-     * @param CI_Controller $controller
+     * @param Restserver_Controller $controller
      * @param string $call
      * @param array $params
      * @return boolean
      */
-    public function run(CI_Controller &$controller, $call, $params) {
+    public function run(Restserver_Controller &$controller, $call, $params) {
         // Collecte les données
         $this->controller =& $controller;
         $this->method = $this->_get_method();

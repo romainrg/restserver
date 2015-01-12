@@ -545,9 +545,9 @@ class Restserver {
         // Si l'autentification par HTTP est activé et qu'il existe une surcharge
         if ($this->config['auth_http'] && method_exists($this->controller, '_auth_login')) {
             return call_user_func_array(array($this->controller, '_auth_login'), array(
-                'username' => $this->username,
-                'password' => $this->password,
-                'ip' => $this->ip
+                $this->username,
+                $this->password,
+                $this->ip
             ));
             
         // Si l'autentification par HTTP est activé et qu'il n'existe pas de surcharge

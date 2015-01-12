@@ -4,7 +4,7 @@
  * Restserver (Librairie REST Serveur)
  * @author Yoann VANITOU
  * @license http://opensource.org/licenses/gpl-license.php GNU Public License
- * @version 1.0.5 (20141212)
+ * @version 1.0.6 (20150112)
  */
 class Restserver {
 
@@ -18,7 +18,7 @@ class Restserver {
      * Version
      * @var string
      */
-    protected $version = '1.0.5 (20141212)';
+    protected $version = '1.0.6 (20150112)';
 
     /**
      * Configuration
@@ -31,7 +31,6 @@ class Restserver {
         'force_https' => FALSE,
         'ajax_only' => FALSE,
         'auth_http' => FALSE,
-        'auth_api' => FALSE,
         'cache' => FALSE,
         'log' => FALSE,
         'log_driver' => 'file',
@@ -75,21 +74,9 @@ class Restserver {
     
     /**
      * L'identifiant
-     * @var string
+     * @var integer
      */
-    protected $username;
-    
-    /**
-     * Le mot de passe
-     * @var string
-     */
-    protected $password;
-    
-    /**
-     * Le token
-     * @var string
-     */
-    protected $key;
+    protected $auth;
     
     /**
      * Les en-têtes
@@ -169,10 +156,6 @@ class Restserver {
         $this->method = $this->_get_method();
         $this->url = $this->_get_url();
         $this->ip = $this->_get_ip();
-        $identifiants = $this->_get_username_password();
-        $this->username = $identifiants['username'];
-        $this->password = $identifiants['password'];
-        $this->key = $this->_get_key();
         $this->headers = $this->_get_headers();
         $this->input = $this->_get_input();
         
@@ -180,49 +163,48 @@ class Restserver {
         $this->_cross_domain();
         
         // Si la requête est de type option (cross domain)
-        if ($this->method === 'option')
-            return $this->response(array(
+        if ($this->method === 'option') {
+            $this->response(array(
                 'status' => TRUE
             ), 200);
+            
+            return TRUE;
+        }
         
         // Si le protocole SSL est obligatoire
         if ($this->config['force_https'] && ! $this->_is_sslprotocol()) {
-			return $this->response(array(
+			$this->response(array(
                 'status' => FALSE,
                 'error' => 'Unsupported protocol'
             ), 403);
+            
+            return FALSE;
 		}
         
         // Si la requête est en ajax
         if ($this->config['ajax_only'] && ! $this->CI->input->is_ajax_request()) {
-			return $this->response(array(
+			$this->response(array(
                 'status' => FALSE,
                 'error' => 'Only AJAX requests are accepted'
             ), 505);
+            
+            return FALSE;
 		}
         		
         // Authentification
-        if ($this->_auth() === FALSE) {
-            return $this->response(array(
-                'status' => FALSE,
-                'error' => 'Authorization failed'
-            ), 401);
+        if ($this->config['auth_http']) {
+            if (!$this->auth = $this->_authentication())
+                return FALSE;
         }
         
-        // Droits
-        if ($this->_right() === FALSE) {
-            return $this->response(array(
-                'status' => FALSE,
-                'error' => 'No rights'
-            ), 401);
-        }
-                
         // Si la méthode existe
         if ( ! method_exists($this->controller, $this->method)) {
-            return $this->response(array(
+            $this->response(array(
                 'status' => FALSE,
                 'error' => 'Method not found'
-            ), 403);
+            ), 200);
+            
+            return FALSE;
         }
         
         // Si la documentation est demandé
@@ -232,10 +214,12 @@ class Restserver {
             
             // Si il existe une docuementation
             if ( ! empty($docs)) {
-                return $this->response(array(
+                $this->response(array(
                     'status' => TRUE,
                     'value' => $docs
                 ), 200);
+                
+                return TRUE;
             }
         }
         
@@ -251,10 +235,12 @@ class Restserver {
 
             // Si le validateur a rencontré une ou plusieurs erreurs
             if ($this->CI->form_validation->run() === FALSE) {
-                return $this->response(array(
+                $this->response(array(
                     'status' => FALSE,
                     'error' => $this->CI->form_validation->get_errors()
                 ), 403);
+                
+                return FALSE;
             }
         }
         
@@ -272,14 +258,27 @@ class Restserver {
                 'status' => FALSE,
                 'error' => $error
             ), 403);
+            
+            return FALSE;
         }
+        
+        return TRUE;
     }
     
     /**
-     * Ajoute une configuration pour un champ
+     * Déclaration de la configuration d'un champ
+     * @param Restserver_field|array $field
      */
-    public function add_field(Restserver_field $field) {
-        $this->fields[] = $field;
+    public function add_field($field) {
+        // Si le data est un tableau de champ
+        if (is_array($field)) {
+            foreach ($field as $value) {
+                $this->add_field($value);
+            }
+        // Si le data est une instance
+        } else if ($field instanceof Restserver_field) {
+            $this->fields[] = $field;
+        }
     }
     
     /**
@@ -377,9 +376,7 @@ class Restserver {
             $log_model->method = ( ! empty($this->method)) ? $this->method : NULL;
             $log_model->url = ( ! empty($this->url)) ? $this->url : NULL;
             $log_model->ip = ( ! empty($this->ip)) ? $this->ip : NULL;
-            $log_model->user = ( ! empty($this->user)) ? $this->user : NULL;
-            $log_model->password = ( ! empty($this->password)) ? $this->password : NULL;
-            $log_model->key = ( ! empty($this->key)) ? $this->key : NULL;
+            $log_model->auth = ($this->auth) ? 1 : 0;
             $log_model->exectime = $this->exectime;
 
             if ($this->config['log_extra']) {
@@ -473,34 +470,7 @@ class Restserver {
         $ip = $this->CI->input->ip_address();
         return ( ! empty($ip)) ? $ip : '';
     }
-    
-    /**
-     * Retourne le nom de l'utilisateur et le mot de passe
-     * @return array
-     */
-    private function _get_username_password() {
-        $username = $this->CI->input->server('PHP_AUTH_USER');
-        $password = $this->CI->input->server('PHP_AUTH_PW');
-        $authentication = $this->CI->input->server('HTTP_AUTHENTICATION');
-        $authorization = $this->CI->input->server('HTTP_AUTHORIZATION');
         
-        if ( ! empty($authentication) && ! empty($authorization)) {
-            if (strpos(strtolower($authentication), 'basic') === 0)
-                list($username, $password) = explode(':', base64_decode(substr($authorization, 6)));
-        }
-        
-        return array('username' => (string)$username, 'password' => (string)$password);
-    }
-        
-    /**
-     * Retourne le token
-     * @return string
-     */
-    private function _get_key() {
-        $key = $this->CI->input->server('HTTP_KEY');
-        return ( ! empty($key)) ? $key : '';
-    }
-    
     /**
      * Retourne la liste des en-têtes
      * @return array
@@ -538,95 +508,15 @@ class Restserver {
     }
     
     /**
-     * Authentification
+     * Authentication
      * @return boolean
      */
-    private function _auth() {
+    private function _authentication() {
         // Si l'autentification par HTTP est activé et qu'il existe une surcharge
-        if ($this->config['auth_http'] && method_exists($this->controller, '_auth_login')) {
-            return call_user_func_array(array($this->controller, '_auth_login'), array(
-                $this->username,
-                $this->password,
-                $this->ip
-            ));
-            
-        // Si l'autentification par HTTP est activé et qu'il n'existe pas de surcharge
-        } else if ($this->config['auth_http']) {
-            return $this->_auth_login($this->username, $this->password, $this->ip);
-        }
+        if (method_exists($this->controller, '_auth'))
+            return call_user_func_array(array($this->controller, '_auth'), array());
         
         return TRUE;
-    }
-    
-    /**
-     * Right
-     * @return boolean
-     */
-    private function _right() {
-        // Si l'autentification par clé api est activé
-        if ($this->config['auth_api'])
-            return $this->_auth_api($this->key);
-        
-        return TRUE;
-    }
-    
-    /**
-     * Authentification par nom d'utilisateur et mot de passe
-     * @param string $username
-     * @param string $password
-     * @param string $ip
-     * @return boolean
-     */
-    private function _auth_login($username, $password, $ip) {
-        // Si l'utilisateur est vide
-        if (empty($username))
-            return FALSE;
-        
-        // Intéroge la base de donnée
-        $user_model = new \rest\user_model();
-        $user = $user_model->where(array(
-            'username' => $username,
-            'password' => sha1($password),
-            'status' => 1,
-        ))->find_one();
-        
-        // Si l'identifiacation est correcte
-        if ( ! empty($user)) {
-            // Si il y a pas de restriction sur l'adresse IP
-            if (empty($user->ip)) {
-                return TRUE;
-            
-            // Si l'adresse IP est correcte
-            } else if ( ! empty($user->ip) && $user->ip == $ip) {
-                return TRUE;
-            }
-        }
-        
-        // Si l'identification est incorrecte
-        return FALSE;
-    }
-    
-    /**
-     * Authentification par api
-     * @return boolean
-     */
-    private function _auth_api() {
-        // Si la clé est vide
-        if (empty($this->key))
-            return FALSE;
-        
-        // Intéroge la base de donnée
-        $api_model = new \rest\api_model();
-        $api = $api_model->where(array(
-            'key' => $this->key,
-            'status' => 1,
-        ))->find_one();
-        
-        // Si l'identifiacation est correcte
-        if ( ! empty($api))
-            return TRUE;
-        
-        return FALSE;
     }
     
     /**

@@ -162,12 +162,12 @@ class Restserver {
         // Envoi les autorisations pour le cross-domain
         $this->_cross_domain();
         
-        // Si la requête est de type option (cross domain)
-        if ($this->method === 'option') {
+        // Si la requête est de type options (cross domain)
+        if ($this->method === 'options') {
             $this->response(array(
                 'status' => TRUE
             ), 200);
-            
+                        
             return TRUE;
         }
         

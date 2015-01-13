@@ -202,7 +202,7 @@ class Restserver {
             $this->response(array(
                 'status' => FALSE,
                 'error' => 'Method not found'
-            ), 200);
+            ), 404);
             
             return FALSE;
         }

@@ -150,7 +150,7 @@ class Restserver {
      * @param array $params
      * @return boolean
      */
-    public function run(Restserver_Controller &$controller, $call, $params) {
+    public function run(Restserver_Controller &$controller, $call, $params) {        
         // Collecte les données
         $this->controller =& $controller;
         $this->method = $this->_get_method();
@@ -196,7 +196,7 @@ class Restserver {
             if (!$this->auth = $this->_authentication())
                 return FALSE;
         }
-        
+                
         // Si la méthode existe
         if ( ! method_exists($this->controller, $this->method)) {
             $this->response(array(

@@ -202,7 +202,7 @@ class Restserver {
             $this->response(array(
                 'status' => FALSE,
                 'error' => 'Method not found'
-            ), 404);
+            ), 405);
             
             return FALSE;
         }
@@ -235,9 +235,12 @@ class Restserver {
 
             // Si le validateur a rencontré une ou plusieurs erreurs
             if ($this->CI->form_validation->run() === FALSE) {
+                
+                $errors = $this->CI->form_validation->get_errors();
+                
                 $this->response(array(
                     'status' => FALSE,
-                    'error' => $this->CI->form_validation->get_errors()
+                    'error' => (!empty($errors)) ? $errors : 'Bad Request'
                 ), 403);
                 
                 return FALSE;
@@ -257,7 +260,7 @@ class Restserver {
             $this->response(array(
                 'status' => FALSE,
                 'error' => $error->getMessage()
-            ), 403);
+            ), 500);
             
             return FALSE;
         }

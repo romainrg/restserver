@@ -158,7 +158,7 @@ class Restserver {
         $this->ip = $this->_get_ip();
         $this->headers = $this->_get_headers();
         $this->input = $this->_get_input();
-        
+               
         // Envoi les autorisations pour le cross-domain
         $this->_cross_domain();
         
@@ -256,7 +256,7 @@ class Restserver {
         } catch (Exception $error) {
             $this->response(array(
                 'status' => FALSE,
-                'error' => $error
+                'error' => $error->getMessage()
             ), 403);
             
             return FALSE;
@@ -377,7 +377,6 @@ class Restserver {
             $log_model->url = ( ! empty($this->url)) ? $this->url : NULL;
             $log_model->ip = ( ! empty($this->ip)) ? $this->ip : NULL;
             $log_model->auth = ($this->auth) ? 1 : 0;
-            $log_model->exectime = $this->exectime;
 
             if ($this->config['log_extra']) {
                 $this->output = $this->CI->output->get_output();
@@ -387,6 +386,8 @@ class Restserver {
                 $log_model->output = ( ! empty($this->output)) ? $this->output : NULL;
             }
 
+            $log_model->httpcode = $code;
+            $log_model->exectime = $this->exectime;
             $log_model->dateinsert = date('Y-m-d H:i:s');
             
             // Enregistre le journal
@@ -569,7 +570,7 @@ class Restserver {
                         
                         // Valeur de l'entrée
                         if ((isset($this->input[$this->method][$field->input]))) {
-                            $input_value =& $this->input[$this->method][$field->input];
+                            $input_value = $this->input[$this->method][$field->input];
                         } else {
                             $input_value = NULL;
                         }
@@ -683,6 +684,7 @@ class Restserver {
                             $log .= " output: $log_model->output".PHP_EOL;
                         }
 
+                        $log .= " httpcode: $log_model->httpcode".PHP_EOL;
                         $log .= " exectime: $log_model->exectime".PHP_EOL;
                         $log .= " date: $log_model->dateinsert".PHP_EOL;
 

@@ -11,37 +11,73 @@ class Exemple extends Restserver_Controller {
     public function __construct() {
         parent::__construct();
         
-        $this->restserver->add_field(new Restserver_field(array(
-            'input' => 'nom',
-            'alias' => 'user_model.lastname|thewebuser_model.nom',
-            'rules' => 'required_post|integer',
-            'name' => 'Nom de famille',
-            'comment' => "Ce champ est un entier il est obligatoire pour la méthode POST")
+        // Configuration
+        $fields = array();
+        
+        // Configuration d'un champ métier
+        $fields[] = new Restserver_field(array(
+            'input' => 'lastname', // Nom entrant
+            'alias' => 'user.lastname|famille.pere.nom', // Modélisation interne
+            'rules' => 'required_post|alpha|min_length[2]|max_length[250]', // Les règles à appliquer
+            'name' => 'Nom', // Nom du champ
+            'comment' => // Documentation et exemples
+                "Nom: Nom de famille".PHP_EOL.
+                "Type: string (min 2, max 250 caractères)".PHP_EOL.
+                "Requis: POST"
         ));
+        
+        // Applique la configuration
+        $this->restserver->add_field($fields);
     }
     
+    /**
+     * Méthode POST
+     */
+    public function post() {
+        // ---------- Exemple de récupération
+        // Récupération du champ entrant
+        $lastname = $this->restserver->input('lastname');
+        
+        // Récupération du champ modélisé
+        $alias = $this->restserver->alias();
+        
+        // Espace de nom 1
+        $lastname = $alias['user']['lastname'];
+        
+        // Espace de nom 2
+        $lastname = $alias['famille']['pere']['nom'];
+        
+        // ---------- Réponse
+        $response = array();
+        $response['status'] = TRUE;
+        $response['error'] = NULL;
+        $response['value'] = array(
+            'lastname' => $lastname
+        );
+        
+        // Envoi la réponse avec le code HTTP 201 Created
+        $this->restserver->response($response, 201);
+    }
+    
+    /**
+     * Méthode GET
+     */
     public function get() {        
-        $this->restserver->response(array(
-            'get' => $this->restserver->get('id')
-        ));
+        $this->restserver->response();
     }
-    
-    public function post() {        
-        $this->restserver->response(array(
-            'post' => $this->restserver->post('id')
-        ));
-    }
-    
+        
+    /**
+     * Méthode PUR
+     */
     public function put() {
-        $this->restserver->response(array(
-            'put' => $this->restserver->put('id')
-        ));
+        $this->restserver->response();
     }
     
+    /**
+     * Méthode DELETE
+     */
     public function delete() {
-        $this->restserver->response(array(
-            'delete' => $this->restserver->delete('id')
-        ));
+        $this->restserver->response();
     }
 }
 

@@ -4,7 +4,7 @@
  * Restserver (Librairie REST Serveur)
  * @author Yoann VANITOU
  * @license http://opensource.org/licenses/gpl-license.php GNU Public License
- * @version 1.0.6 (20150112)
+ * @version 1.0.7 (20150122)
  */
 $config['restserver'] = array(
     'allow_methods' => array('GET', 'POST', 'PUT', 'DELETE'),

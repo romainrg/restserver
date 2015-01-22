@@ -4,7 +4,7 @@
  * Restserver (Librairie REST Serveur)
  * @author Yoann VANITOU
  * @license http://opensource.org/licenses/gpl-license.php GNU Public License
- * @version 1.0.6 (20150112)
+ * @version 1.0.7 (20150122)
  */
 class Restserver {
 
@@ -18,7 +18,7 @@ class Restserver {
      * Version
      * @var string
      */
-    protected $version = '1.0.6 (20150112)';
+    protected $version = '1.0.7 (20150122)';
 
     /**
      * Configuration
@@ -303,7 +303,23 @@ class Restserver {
     public function alias() {
         return $this->alias;
     }
-        
+    
+    /**
+     * Obtenir le protocole
+     * @return array
+     */
+    public function protocol() {
+        return $this->protocol;
+    }
+    
+    /**
+     * Obtenir la liste des champs
+     * @return array
+     */
+    public function fields() {
+        return $this->fields;
+    }
+    
     /**
      * Les données de la méthode Get
      * @param string|null $key

@@ -321,6 +321,31 @@ class Restserver {
     }
     
     /**
+     * Sérialisation des filtres
+     * @param array $filter
+     * @return array
+     */
+    public function filter(array $filter) {
+        $filters = array();
+        
+        if ( ! empty($filter)) {
+            $filter = json_decode($filter, TRUE);
+            
+            foreach ($filter as $value) {
+                if (isset($value['property'])) {
+                    if ( ! isset($filters[$value['property']])) {
+                        $filters[$value['property']] = $value['value'];
+                    } else {
+                        $filters[$value['property']] .= ',' . $value['value'];
+                    }
+                }
+            }
+        }
+        
+        return $filters;
+    }
+    
+    /**
      * Les données de la méthode Get
      * @param string|null $key
      * @param boolean $xss_clean

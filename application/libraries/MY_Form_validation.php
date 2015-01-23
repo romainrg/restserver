@@ -4,7 +4,7 @@
  * Restserver (Librairie REST Serveur)
  * @author Yoann VANITOU
  * @license http://opensource.org/licenses/gpl-license.php GNU Public License
- * @version 1.0.7 (20150122)
+ * @version 1.0.6 (20150112)
  */
 class MY_Form_validation extends CI_Form_validation {
 
@@ -30,7 +30,7 @@ class MY_Form_validation extends CI_Form_validation {
     public function set_data($data = NULL) {
         // Récupère la méthode de la requête
         $method = $this->CI->input->server('REQUEST_METHOD');
-       
+               
         // La méthode
         $this->method = ( ! empty($method)) ? strtolower($method) : 'post';
         
@@ -53,7 +53,7 @@ class MY_Form_validation extends CI_Form_validation {
             if ($this->error($value['field']) != '')
                 $errors[$value['field']] = $this->error($value['field']);
         }
-
+        
         return $errors;
     }
 
@@ -69,11 +69,6 @@ class MY_Form_validation extends CI_Form_validation {
      * @return	void
      */
     public function set_rules($field, $label = '', $rules = '') {
-
-        // No reason to set rules if we have no POST data
-        if (count($this->data) == 0)
-            return $this;
-
         // If an array was passed via the first parameter instead of indidual string
         // values we cycle through it and recursively call this function.
         if (is_array($field)) {
@@ -254,7 +249,7 @@ class MY_Form_validation extends CI_Form_validation {
      * @param	integer
      * @return	mixed
      */
-    protected function _execute($row, $rules, $postdata = NULL, $cycles = 0) {
+    protected function _execute($row, $rules, $postdata = NULL, $cycles = 0) {        
         // If the $_POST data is an array we will run a recursive call
         if (is_array($postdata)) {
             foreach ($postdata as $key => $val) {

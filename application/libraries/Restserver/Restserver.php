@@ -6,6 +6,10 @@
  * @license http://opensource.org/licenses/gpl-license.php GNU Public License
  * @version 1.0.7 (20150122)
  */
+
+//error_reporting(E_ALL);
+//ini_set('display_errors', 'on');
+
 class Restserver {
 
     /**
@@ -158,7 +162,7 @@ class Restserver {
         $this->ip = $this->_get_ip();
         $this->headers = $this->_get_headers();
         $this->input = $this->_get_input();
-               
+                       
         // Envoi les autorisations pour le cross-domain
         $this->_cross_domain();
         
@@ -232,15 +236,12 @@ class Restserver {
             $this->CI->form_validation->set_data($this->input[$this->method]);
             $this->CI->form_validation->set_rules($rules);
             $this->CI->form_validation->set_error_delimiters('', '');
-
+            
             // Si le validateur a rencontré une ou plusieurs erreurs
             if ($this->CI->form_validation->run() === FALSE) {
-                
-                $errors = $this->CI->form_validation->get_errors();
-                
                 $this->response(array(
                     'status' => FALSE,
-                    'error' => (!empty($errors)) ? $errors : 'Bad Request'
+                    'error' => $this->CI->form_validation->get_errors()
                 ), 403);
                 
                 return FALSE;
@@ -322,10 +323,10 @@ class Restserver {
     
     /**
      * Sérialisation des filtres
-     * @param array $filter
+     * @param string $filter
      * @return array
      */
-    public function filter(array $filter) {
+    public function filter($filter) {
         $filters = array();
         
         if ( ! empty($filter)) {
@@ -387,7 +388,7 @@ class Restserver {
     
     /**
      * Envoi une réponce au client
-     * @param array $data
+     * @param array l
      * @param integer|null $code
      */
     public function response(array $data = array(), $code = NULL) {
@@ -530,26 +531,39 @@ class Restserver {
      * @return array
      */
     private function _get_input() {
-        $input = array(
-            'get' => $this->CI->input->get(),
-            'post' => $this->CI->input->post(),
-            'put' => array(),
-            'delete' => array()
+        $get = $this->CI->input->get();
+        $post = NULL;
+        $put = NULL;
+        $delete = NULL;
+               
+        switch ($this->method) {
+            case 'post':
+                $post = $this->CI->input->post();
+                
+                // Si les données entrantes sont un POST normal
+                if (!empty($post))
+                    break;
+            
+            case 'put':
+            case 'delete':
+                // Récupère les données entrantes
+                $input = file_get_contents('php://input');
+                
+                // Si les données sont en JSON
+                ${$this->method} = @json_decode($input, TRUE);
+                
+                // Si les données sont en HTTP
+                if (empty(${$this->method}))
+                    parse_str($input, ${$this->method});
+        }
+        
+        // Renvoi les données entrantes
+        return array(
+            'get' => (is_array($get)) ? $get : array(),
+            'post' => (is_array($post)) ? $post : array(),
+            'put' => (is_array($put)) ? $put : array(),
+            'delete' => (is_array($delete)) ? $delete : array()
         );
-        
-        // Récupère les autres flux entrant
-        parse_str(file_get_contents('php://input'), $input['put']);
-        parse_str(file_get_contents('php://input'), $input['delete']);
-        
-        // Si le flux est vide
-        if ( ! is_array($input['get']))
-            $input['get'] = array();
-        
-        // Si le flux est vide
-        if ( ! is_array($input['post']))
-            $input['post'] = array();
-        
-        return $input;
     }
     
     /**
@@ -625,7 +639,7 @@ class Restserver {
                 }
             }
         }
-        
+                
         return $alias;
     }
     

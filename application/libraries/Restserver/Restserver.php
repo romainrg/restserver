@@ -4,7 +4,7 @@
  * Restserver (Librairie REST Serveur)
  * @author Yoann VANITOU
  * @license http://opensource.org/licenses/gpl-license.php GNU Public License
- * @version 1.0.7 (20150122)
+ * @version 1.0.7 (20150125)
  */
 
 //error_reporting(E_ALL);
@@ -32,6 +32,7 @@ class Restserver {
         'allow_methods' => array(),
         'allow_headers' => array(),
         'allow_credentials' => FALSE,
+        'allow_origin' => FALSE,
         'force_https' => FALSE,
         'ajax_only' => FALSE,
         'auth_http' => FALSE,
@@ -480,14 +481,28 @@ class Restserver {
      * Envoi les entêtes pour le cross domaine
      */
     private function _cross_domain() {
-        // Autorise le cross-domain
+        // Autorisation des méthode
         $this->CI->output->set_header('Access-Control-Allow-Methods: '.implode(',', $this->config['allow_methods']));
+        
+        // Autorisation des en-têtes
         $this->CI->output->set_header('Access-Control-Allow-Headers: '.implode(',', $this->config['allow_headers']));
         
-        if ($this->config['allow_credentials'])
+        // Autorisation credential
+        if ($this->config['allow_credentials'] && $this->config['allow_credentials'])
             $this->CI->output->set_header('Access-Control-Allow-Credentials: true');
         
-        $this->CI->output->set_header('Access-Control-Allow-Origin: '.(( ! empty($this->headers['Origin'])) ? $this->headers['Origin'] : $this->ip));
+        // Autorise tout le monde
+        if ($this->config['allow_origin'] === FALSE) {
+            $this->CI->output->set_header('Access-Control-Allow-Origin: '.(( ! empty($this->headers['Origin'])) ? $this->headers['Origin'] : $this->ip));
+            
+        // Autorise une liste
+        } else if (is_array($this->config['allow_origin']) && in_array($this->ip, $this->config['allow_origin'])) {
+            $this->CI->output->set_header('Access-Control-Allow-Origin: '.$this->ip);
+            
+        // Autrement seulement un host
+        } else if (!empty($this->config['allow_origin'])) {
+            $this->CI->output->set_header('Access-Control-Allow-Origin: '.$this->config['allow_credentials']);
+        }
     }
     
     /**
@@ -522,7 +537,7 @@ class Restserver {
      * @return array
      */
     private function _get_headers() {
-        $headers = $headers = $this->CI->input->request_headers(TRUE);        
+        $headers = $this->CI->input->request_headers(TRUE);        
         return ( ! empty($headers)) ? $headers : array();
     }
     

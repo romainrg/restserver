@@ -6,7 +6,6 @@
  * @license http://opensource.org/licenses/gpl-license.php GNU Public License
  * @version 1.0.7 (20150125)
  */
-
 class Restserver {
 
     /**

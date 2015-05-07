@@ -12,10 +12,10 @@ $config['restserver'] = array(
     'force_https' => FALSE,
     'ajax_only' => FALSE,
     'auth_http' => FALSE,
-    'log' => TRUE,
-    'log_driver' => 'database',
+    'log' => FALSE,
+    'log_driver' => 'file',
     'log_path' => "",
-    'log_extra' => TRUE
+    'log_extra' => FALSE
 );
 ```
 

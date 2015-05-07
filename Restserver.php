@@ -7,9 +7,6 @@
  * @version 1.0.7 (20150125)
  */
 
-//error_reporting(E_ALL);
-//ini_set('display_errors', 'on');
-
 class Restserver {
 
     /**

@@ -1,11 +1,41 @@
-<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+# restclient
+REST Full Server for Codeigniter
 
-/** 
- * Restserver (Librairie REST Serveur)
- * @author Yoann VANITOU
- * @license http://opensource.org/licenses/gpl-license.php GNU Public License
- * @version 1.0.7 (20150125)
- */
+## Config
+/application/config/restserver.php:
+```php
+$config['restserver'] = array(
+    'allow_methods' => array('GET', 'POST', 'PUT', 'DELETE'),
+    'allow_headers' => array('authorization', 'key', 'content-type', 'x-requested-with'),
+    'allow_credentials' => FALSE,
+    'allow_origin' => FALSE,
+    'force_https' => FALSE,
+    'ajax_only' => FALSE,
+    'auth_http' => FALSE,
+    'log' => TRUE,
+    'log_driver' => 'database',
+    'log_path' => "",
+    'log_extra' => TRUE
+);
+```
+
+## Extends controller
+/application/core/MY_Controller.php:
+```php
+class MY_Controller extends CI_Controller {
+
+    public function __construct() {
+        parent::__construct();
+    }
+    
+}
+
+require(APPPATH.'/libraries/Restserver/Restserver_Controller.php');
+```
+
+## Examples
+/application/controllers/exemple.php:
+```php
 class Exemple extends Restserver_Controller {
 
     public function __construct() {
@@ -80,6 +110,4 @@ class Exemple extends Restserver_Controller {
         $this->restserver->response();
     }
 }
-
-/* End of file exemple.php */
-/* Location: ./application/controllers/exemple.php */
+```

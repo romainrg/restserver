@@ -1,4 +1,4 @@
-# restclient
+# restserver
 REST Full Server for Codeigniter
 
 ## Config
@@ -26,6 +26,29 @@ class MY_Controller extends CI_Controller {
 
     public function __construct() {
         parent::__construct();
+    }
+
+    /**
+     * Optional authentification
+     * @return boolean
+     */
+    public function _auth() {
+        $username = $this->restserver->input('username');
+        $password = $this->restserver->input('password');
+        
+        if ($username == 'test' && $password == 'test') {
+            return TRUE;
+            
+        // Si il y a une erreur
+        } else {            
+            // Prépare la réponse
+            $this->restserver->response(array(
+                'status' => FALSE,
+                'error' => "Vos identifiants sont invalides"
+            ), 406);
+            
+            return FALSE;
+        }
     }
     
 }

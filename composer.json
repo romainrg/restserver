@@ -1,7 +1,7 @@
 {
     "name": "maltyxx/restserver",
-    "keywords": ["codeigniter", "rest","server"],
-    "description": "Librairie REST Server pour CodeIgniter",
+    "keywords": ["codeigniter", "rest", "server"],
+    "description": "REST Full Server for Codeigniter 2 and Codeigniter 3",
     "homepage": "https://github.com/maltyxx/restserver",
     "license": "Apache-2.0",
     "type": "codeigniter-library",

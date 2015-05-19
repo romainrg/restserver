@@ -3,12 +3,11 @@
 /** 
  * Restserver (Librairie REST Serveur)
  * @author Yoann VANITOU
- * @license http://opensource.org/licenses/gpl-license.php GNU Public License
- * @version 1.0.7 (20150125)
+ * @license http://www.apache.org/licenses/LICENSE-2.0
  */
 
 // Interface
-require(APPPATH.'/libraries/Restserver/Restserver_interface.php');
+require(__DIR__.'/Restserver_interface.php');
 
 abstract class Restserver_Controller extends MY_Controller implements Restserver_interface {    
     

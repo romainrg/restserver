@@ -1,10 +1,11 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
+require(__DIR__.'/Restserver_field.php');
+
 /** 
  * Restserver (Librairie REST Serveur)
  * @author Yoann VANITOU
- * @license http://opensource.org/licenses/gpl-license.php GNU Public License
- * @version 1.0.7 (20150125)
+ * @license http://www.apache.org/licenses/LICENSE-2.0
  */
 class Restserver {
 
@@ -18,7 +19,7 @@ class Restserver {
      * Version
      * @var string
      */
-    protected $version = '1.0.7 (20150122)';
+    protected $version = '1.1.0';
 
     /**
      * Configuration

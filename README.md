@@ -1,27 +1,26 @@
 # restserver
-REST Full Server for Codeigniter
+REST Full Server for Codeigniter 2 and Codeigniter 3
 
-## Config
-/application/config/restserver.php:
-```php
-$config['restserver'] = array(
-    'allow_methods' => array('GET', 'POST', 'PUT', 'DELETE'),
-    'allow_headers' => array('authorization', 'key', 'content-type', 'x-requested-with'),
-    'allow_credentials' => FALSE,
-    'allow_origin' => FALSE,
-    'force_https' => FALSE,
-    'ajax_only' => FALSE,
-    'auth_http' => FALSE,
-    'log' => FALSE,
-    'log_driver' => 'file',
-    'log_path' => "",
-    'log_extra' => FALSE
-);
+## Installation
+### Step 1 Installation by Composer
+```txt
+# composer install maltyxx/restserver
 ```
 
-## Extends controller
-/application/core/MY_Controller.php:
+### Step 2 Creates files
+```txt
+/application/libraries/Restserver.php
+```
 ```php
+<?php defined('BASEPATH') OR exit('No direct script access allowed');
+require(APPPATH.'/libraries/Restserver/Restserver.php');
+```
+```txt
+/application/core/MY_Controller.php:
+```
+```php
+<?php defined('BASEPATH') OR exit('No direct script access allowed');
+
 class MY_Controller extends CI_Controller {
 
     public function __construct() {
@@ -56,9 +55,31 @@ class MY_Controller extends CI_Controller {
 require(APPPATH.'/libraries/Restserver/Restserver_Controller.php');
 ```
 
+### Step 3 Configuration
+/application/config/restserver.php:
+```php
+<?php defined('BASEPATH') OR exit('No direct script access allowed');
+
+$config['restserver'] = array(
+    'allow_methods' => array('GET', 'POST', 'PUT', 'DELETE'),
+    'allow_headers' => array('authorization', 'key', 'content-type', 'x-requested-with'),
+    'allow_credentials' => FALSE,
+    'allow_origin' => FALSE,
+    'force_https' => FALSE,
+    'ajax_only' => FALSE,
+    'auth_http' => FALSE,
+    'log' => FALSE,
+    'log_driver' => 'file',
+    'log_path' => "",
+    'log_extra' => FALSE
+);
+```
+
 ## Examples
 /application/controllers/exemple.php:
 ```php
+<?php defined('BASEPATH') OR exit('No direct script access allowed');
+
 class Exemple extends Restserver_Controller {
 
     public function __construct() {

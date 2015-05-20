@@ -141,7 +141,7 @@ class Exemple extends Restserver_Controller {
     }
         
     /**
-     * Méthode PUR
+     * Méthode PUT
      */
     public function put() {
         $this->restserver->response();

@@ -97,8 +97,8 @@ class Exemple extends Restserver_Controller {
         $fields[] = new Restserver_field(array(
             'input' => 'lastname', // Nom entrant
             'alias' => 'user.lastname|famille.pere.nom', // Modélisation interne
+            'label' => 'Nom', // Nom du champ
             'rules' => 'required_post|alpha|min_length[2]|max_length[250]', // Les règles à appliquer
-            'name' => 'Nom', // Nom du champ
             'comment' => // Documentation et exemples
                 "Nom: Nom de famille".PHP_EOL.
                 "Type: string (min 2, max 250 caractères)".PHP_EOL.

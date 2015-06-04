@@ -127,7 +127,7 @@ class Exemple extends Restserver_Controller {
         $lastname = $alias['famille']['pere']['nom'];
         
         // ---------- Réponse
-        $response = array();
+        $response = $this->restserver->protocol();
         $response['status'] = TRUE;
         $response['error'] = NULL;
         $response['value'] = array(

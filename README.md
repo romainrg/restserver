@@ -81,11 +81,11 @@ $config['restserver'] = array(
 ```
 
 ## Examples
-/application/controllers/exemple.php:
+/application/controllers/Server.php:
 ```php
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 
-class Exemple extends Restserver_Controller {
+class Server extends Restserver_Controller {
 
     public function __construct() {
         parent::__construct();

@@ -1,4 +1,4 @@
-# restserver
+# Restserver
 REST Full Server for Codeigniter 2 and Codeigniter 3
 
 ## Installation
@@ -7,7 +7,12 @@ REST Full Server for Codeigniter 2 and Codeigniter 3
 # composer install maltyxx/restserver
 ```
 
-### Step 2 Creates files
+### Step 2 Configuration form_validation
+```txt
+https://github.com/maltyxx/form_validation
+```
+
+### Step 3 Creates files
 ```txt
 /application/libraries/Restserver.php
 ```
@@ -55,7 +60,7 @@ class MY_Controller extends CI_Controller {
 require(APPPATH.'/libraries/Restserver/Restserver_Controller.php');
 ```
 
-### Step 3 Configuration
+### Step 4 Configuration
 /application/config/restserver.php:
 ```php
 <?php defined('BASEPATH') OR exit('No direct script access allowed');

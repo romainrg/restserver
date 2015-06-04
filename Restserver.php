@@ -6,6 +6,7 @@ require(__DIR__.'/Restserver_field.php');
  * Restserver (Librairie REST Serveur)
  * @author Yoann VANITOU
  * @license http://www.apache.org/licenses/LICENSE-2.0
+ * @link https://github.com/maltyxx/restserver
  */
 class Restserver {
 
@@ -227,7 +228,7 @@ class Restserver {
         
         // Récupère les règles
         $rules = $this->_get_rules();
-        
+                
         // Si des règles existent
         if ( ! empty($rules)) {
             // Vérification des données entrantes
@@ -239,7 +240,7 @@ class Restserver {
             if ($this->CI->form_validation->run() === FALSE) {
                 $this->response(array(
                     'status' => FALSE,
-                    'error' => $this->CI->form_validation->get_errors()
+                    'error' => $this->CI->form_validation->error_array()
                 ), 403);
                 
                 return FALSE;

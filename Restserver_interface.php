@@ -4,6 +4,7 @@
  * Restserver (Librairie REST Serveur)
  * @author Yoann VANITOU
  * @license http://www.apache.org/licenses/LICENSE-2.0
+ * @link https://github.com/maltyxx/restserver
  */
 interface Restserver_interface {
 

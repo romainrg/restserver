@@ -103,7 +103,8 @@ class Server extends Restserver_Controller {
             'label' => 'Nom', // Nom du champ
             'rules' => 'required_post|alpha|min_length[2]|max_length[250]', // Les règles à appliquer
             'comment' => // Documentation et exemples
-                "Nom: Nom de famille".PHP_EOL.
+                "Input: lastname".PHP_EOL.
+                "Label: Nom de famille".PHP_EOL.
                 "Type: string (min 2, max 250 caractères)".PHP_EOL.
                 "Requis: POST"
         ));

@@ -40,7 +40,7 @@ class Restserver {
         'log_db_name' => 'rest', // Database only
         'log_db_table' => 'log', // Database only
         'log_file_path' => '', // File only
-        'log_file_name' => '', // File only
+        'log_file_name' => 'rest.log', // File only
         'log_extra' => FALSE 
     );
     

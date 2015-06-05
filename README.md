@@ -67,7 +67,7 @@ require(APPPATH.'/libraries/Restserver/Restserver_Controller.php');
 
 $config['restserver'] = array(
     'allow_methods' => array('GET', 'POST', 'PUT', 'DELETE'),
-    'allow_headers' => array('authorization', 'key', 'content-type', 'x-requested-with'),
+    'allow_headers' => array('authorization', 'content-type', 'x-requested-with'),
     'allow_credentials' => FALSE,
     'allow_origin' => FALSE,
     'force_https' => FALSE,

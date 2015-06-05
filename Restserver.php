@@ -27,8 +27,8 @@ class Restserver {
      * @var array
      */
     protected $config = array(
-        'allow_methods' => array(),
-        'allow_headers' => array(),
+        'allow_methods' => array('GET', 'POST', 'PUT', 'DELETE'),
+        'allow_headers' => array('authorization', 'content-type', 'x-requested-with'),
         'allow_credentials' => FALSE,
         'allow_origin' => FALSE,
         'force_https' => FALSE,

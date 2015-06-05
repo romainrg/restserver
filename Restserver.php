@@ -20,7 +20,7 @@ class Restserver {
      * Version
      * @var string
      */
-    protected $version = '1.1.2';
+    protected $version = '1.2.0';
 
     /**
      * Configuration
@@ -37,8 +37,11 @@ class Restserver {
         'cache' => FALSE,
         'log' => FALSE,
         'log_driver' => 'file',
-        'log_path' => '',
-        'log_extra' => FALSE
+        'log_db_name' => 'rest', // Database only
+        'log_db_table' => 'log', // Database only
+        'log_file_path' => '', // File only
+        'log_file_name' => '', // File only
+        'log_extra' => FALSE 
     );
     
     /**
@@ -141,7 +144,6 @@ class Restserver {
             $this->CI->benchmark->mark('restserver_start');
         
         // Change les paquets
-        $this->CI->load->library('orm');
         $this->CI->load->library('form_validation');
         $this->CI->load->helper('url');
     }
@@ -416,7 +418,7 @@ class Restserver {
             $this->CI->benchmark->mark('restserver_end');
             $this->exectime = $this->CI->benchmark->elapsed_time('restserver_start', 'restserver_end');
             
-            $log_model = new \rest\log_model();
+            $log_model = new stdClass();
             $log_model->method = ( ! empty($this->method)) ? $this->method : NULL;
             $log_model->url = ( ! empty($this->url)) ? $this->url : NULL;
             $log_model->ip = ( ! empty($this->ip)) ? $this->ip : NULL;
@@ -727,18 +729,21 @@ class Restserver {
 
     /**
      * Insert les évènements dans un journal
-     * @param \rest\log_model $log_model
+     * @param stdClass $log_model
      */
-    private function _set_log(\rest\log_model $log_model) {      
+    private function _set_log(stdClass $log_model) {      
         switch ($this->config['log_driver']) {            
-            case 'database':
-                $log_model->save();
+            case 'db':
+                // Connection à la base de donnée
+                $this->CI->db_{$this->config['log_db_name']} = $this->CI->load->database($this->config['log_db_name'], TRUE);
+                
+                // Insertion des données
+                $this->CI->db_{$this->config['log_db_name']}->insert($this->config['log_db_table'], $log_model);
                 break;
             case 'file':
             default:
-                $file_name = 'restserver.log';
-                $file_path = ( ! empty($this->config['log_path'])) ? $this->config['log_path'] : sys_get_temp_dir();
-                $file = "$file_path/$file_name";
+                $file_path = ( ! empty($this->config['log_file_path'])) ? $this->config['log_file_path'] : sys_get_temp_dir();
+                $file = "$file_path/{$this->config['log_file_name']}";
 
                 if (touch($file)) {
                     if (is_file($file) && is_writable($file)) {

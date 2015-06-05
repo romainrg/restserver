@@ -75,7 +75,10 @@ $config['restserver'] = array(
     'auth_http' => FALSE,
     'log' => FALSE,
     'log_driver' => 'file',
-    'log_path' => '',
+    'log_db_name' => '', // Database only
+    'log_db_table' => '', // Database only
+    'log_file_path' => '', // File only
+    'log_file_name' => '', // File only
     'log_extra' => FALSE
 );
 ```

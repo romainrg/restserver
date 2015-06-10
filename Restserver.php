@@ -28,7 +28,7 @@ class Restserver {
      */
     protected $config = array(
         'allow_methods' => array('GET', 'POST', 'PUT', 'DELETE'),
-        'allow_headers' => array('authorization', 'content-type', 'x-requested-with'),
+        'allow_headers' => array('X-RestServer'),
         'allow_credentials' => FALSE,
         'allow_origin' => FALSE,
         'force_https' => FALSE,
@@ -408,7 +408,12 @@ class Restserver {
                         
         // Définition du code HTTP
         $this->CI->output->set_status_header($code);
-                        
+        
+        // Envoi les entetes
+        if (ENVIRONMENT === 'development') {
+            $this->CI->output->set_header("X-RestServer: v$this->version");
+        }
+        
         // Encode le data
         $this->CI->output->set_output(json_encode($data));
                 
@@ -451,10 +456,9 @@ class Restserver {
     
     /**
      * Les données entrantes
-     * @param string $method
-     * @param string|null $index
+     * @param string|null $key
      * @param boolean $xss_clean
-     * @return mixed
+     * @return array|booblean
      */
     private function _fetch_from_array($method, $index = NULL, $xss_clean = TRUE) {
         // Si l'index n'est définie on récupère l'ensemble de l'input

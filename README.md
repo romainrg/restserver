@@ -11,7 +11,7 @@ REST Full Server for Codeigniter 2 and Codeigniter 3
 }
 ```
 ```shell
-# composer update
+composer update
 ```
 
 ### Step 2 Configuration form_validation

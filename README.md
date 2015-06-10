@@ -128,7 +128,7 @@ class Server extends Restserver_Controller {
     public function post() {
         // ---------- Exemple de récupération
         // Récupération du champ entrant
-        $lastname = $this->restserver->input('lastname');
+        $lastname = $this->restserver->post('lastname');
         
         // Récupération du champ modélisé
         $alias = $this->restserver->alias();

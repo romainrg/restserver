@@ -3,8 +3,12 @@ REST Full Server for Codeigniter 2 and Codeigniter 3
 
 ## Installation
 ### Step 1 Installation by Composer
-```txt
-# composer install maltyxx/restserver
+```json
+{
+    "require": {
+        "maltyxx/restserver": "1.2.*"
+    }
+}
 ```
 
 ### Step 2 Configuration form_validation

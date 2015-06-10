@@ -20,7 +20,7 @@ class Restserver {
      * Version
      * @var string
      */
-    protected $version = '1.2.0';
+    protected $version = '1.2.1';
 
     /**
      * Configuration
@@ -349,42 +349,42 @@ class Restserver {
     
     /**
      * Les données de la méthode Get
-     * @param string|null $key
+     * @param string|null $index
      * @param boolean $xss_clean
-     * @return array|booblean
+     * @return mixed
      */
-    public function get($key = NULL, $xss_clean = TRUE) {
-        return $this->_get_input_method('get', $key, $xss_clean);
+    public function get($index = NULL, $xss_clean = TRUE) {
+        return $this->_fetch_from_array('get', $index, $xss_clean);
     }
     
     /**
      * Les données de la méthode Post
-     * @param string|null $key
+     * @param string|null $index
      * @param boolean $xss_clean
-     * @return array|booblean
+     * @return mixed
      */
-    public function post($key = NULL, $xss_clean = TRUE) {
-        return $this->_get_input_method('post', $key, $xss_clean);
+    public function post($index = NULL, $xss_clean = TRUE) {
+        return $this->_fetch_from_array('post', $index, $xss_clean);
     }
     
     /**
      * Les données de la méthode Put
-     * @param string|null $key
+     * @param string|null $index
      * @param boolean $xss_clean
-     * @return array|booblean
+     * @return mixed
      */
-    public function put($key = NULL, $xss_clean = TRUE) {
-        return $this->_get_input_method('put', $key, $xss_clean);
+    public function put($index = NULL, $xss_clean = TRUE) {
+        return $this->_fetch_from_array('put', $index, $xss_clean);
     }
     
     /**
      * Les données de la méthode Delete
-     * @param string|null $key
+     * @param string|null $index
      * @param boolean $xss_clean
-     * @return array|booblean
+     * @return mixed
      */
-    public function delete($key = NULL, $xss_clean = TRUE) {        
-        return $this->_get_input_method('delete', $key, $xss_clean);
+    public function delete($index = NULL, $xss_clean = TRUE) {        
+        return $this->_fetch_from_array('delete', $index, $xss_clean);
     }
     
     /**
@@ -451,22 +451,37 @@ class Restserver {
     
     /**
      * Les données entrantes
-     * @param string|null $key
+     * @param string $method
+     * @param string|null $index
      * @param boolean $xss_clean
-     * @return array|booblean
+     * @return mixed
      */
-    private function _get_input_method($method, $key = NULL, $xss_clean = TRUE) {                
-        if ($key === NULL) {
-            $input = array();
-            
-            foreach (array_keys($this->input[$method]) as $name) {
-                $input[$name] = $this->CI->input->_fetch_from_array($this->input[$method], $name, $xss_clean);
-            }
-            
-            return $input;
+    private function _fetch_from_array($method, $index = NULL, $xss_clean = TRUE) {
+        // Si l'index n'est définie on récupère l'ensemble de l'input
+        if (empty($index)) {
+            $index = array_keys($this->input[$method]);
         }
         
-        return $this->CI->input->_fetch_from_array($this->input[$method], $key, $xss_clean);
+        // Si l'index est est tableau d'index
+        if (is_array($index)) {
+            $output = array();
+            
+			foreach ($index as $i) {
+				$output[$i] = $this->_fetch_from_array($method, $i, $xss_clean);
+			}
+
+			return $output;
+        }
+        
+        if (!isset($this->input[$method][$index])) {
+            return NULL;
+		}
+
+        if ($xss_clean === TRUE) {
+            return $this->CI->security->xss_clean($this->input[$method][$index]);
+        }
+        
+        return $this->input[$method][$index];
     }
     
     /**
@@ -550,20 +565,22 @@ class Restserver {
         $post = NULL;
         $put = NULL;
         $delete = NULL;
-               
+        
         switch ($this->method) {
             case 'post':
                 $post = $this->CI->input->post();
-                
+                               
                 // Si les données entrantes sont un POST normal
-                if (!empty($post))
+                if (!empty($post)) {
                     break;
+                }
             
+            case 'patch':
             case 'put':
             case 'delete':
                 // Récupère les données entrantes
                 $input = file_get_contents('php://input');
-                
+                                
                 // Si les données sont en JSON
                 ${$this->method} = @json_decode($input, TRUE);
                 
@@ -731,8 +748,8 @@ class Restserver {
      * Insert les évènements dans un journal
      * @param stdClass $log_model
      */
-    private function _set_log(stdClass $log_model) {      
-        switch ($this->config['log_driver']) {            
+    private function _set_log(stdClass $log_model) {
+        switch ($this->config['log_driver']) {
             case 'db':
                 // Connection à la base de donnée
                 $this->CI->db_{$this->config['log_db_name']} = $this->CI->load->database($this->config['log_db_name'], TRUE);
@@ -769,6 +786,7 @@ class Restserver {
                 }
         }
     }
+    
 }
 
 /* End of file Restserver.php */

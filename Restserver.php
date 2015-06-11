@@ -20,7 +20,7 @@ class Restserver {
      * Version
      * @var string
      */
-    protected $version = '1.2.3';
+    protected $version = '1.2.4';
 
     /**
      * Configuration
@@ -353,7 +353,7 @@ class Restserver {
      * @param boolean $xss_clean
      * @return mixed
      */
-    public function get($index = NULL, $xss_clean = TRUE) {
+    public function get($index = NULL, $xss_clean = FALSE) {
         return $this->_fetch_from_array('get', $index, $xss_clean);
     }
     
@@ -363,7 +363,7 @@ class Restserver {
      * @param boolean $xss_clean
      * @return mixed
      */
-    public function post($index = NULL, $xss_clean = TRUE) {
+    public function post($index = NULL, $xss_clean = FALSE) {
         return $this->_fetch_from_array('post', $index, $xss_clean);
     }
     
@@ -373,7 +373,7 @@ class Restserver {
      * @param boolean $xss_clean
      * @return mixed
      */
-    public function put($index = NULL, $xss_clean = TRUE) {
+    public function put($index = NULL, $xss_clean = FALSE) {
         return $this->_fetch_from_array('put', $index, $xss_clean);
     }
     
@@ -383,7 +383,7 @@ class Restserver {
      * @param boolean $xss_clean
      * @return mixed
      */
-    public function delete($index = NULL, $xss_clean = TRUE) {        
+    public function delete($index = NULL, $xss_clean = FALSE) {        
         return $this->_fetch_from_array('delete', $index, $xss_clean);
     }
     
@@ -460,7 +460,7 @@ class Restserver {
      * @param boolean $xss_clean
      * @return array|booblean
      */
-    private function _fetch_from_array($method, $index = NULL, $xss_clean = TRUE) {
+    private function _fetch_from_array($method, $index = NULL, $xss_clean = FALSE) {
         // Si l'index n'est définie on récupère l'ensemble de l'input
         if (empty($index)) {
             $index = array_keys($this->input[$method]);

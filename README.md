@@ -26,14 +26,16 @@ https://github.com/maltyxx/form_validation
 /application/libraries/Restserver.php
 ```
 ```php
-<?php defined('BASEPATH') OR exit('No direct script access allowed');
+<?php
+defined('BASEPATH') OR exit('No direct script access allowed');
 require(APPPATH.'/libraries/Restserver/Restserver.php');
 ```
 ```txt
 /application/core/MY_Controller.php:
 ```
 ```php
-<?php defined('BASEPATH') OR exit('No direct script access allowed');
+<?php
+defined('BASEPATH') OR exit('No direct script access allowed');
 
 class MY_Controller extends CI_Controller {
 
@@ -72,7 +74,8 @@ require(APPPATH.'/libraries/Restserver/Restserver_Controller.php');
 ### Step 4 Configuration
 /application/config/restserver.php:
 ```php
-<?php defined('BASEPATH') OR exit('No direct script access allowed');
+<?php
+defined('BASEPATH') OR exit('No direct script access allowed');
 
 $config['restserver'] = array(
     'allow_methods' => array('GET', 'POST', 'PUT', 'DELETE'),
@@ -95,7 +98,8 @@ $config['restserver'] = array(
 ## Examples
 /application/controllers/Server.php:
 ```php
-<?php defined('BASEPATH') OR exit('No direct script access allowed');
+<?php
+defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Server extends Restserver_Controller {
 

@@ -20,7 +20,7 @@ class Restserver {
      * Version
      * @var string
      */
-    protected $version = '1.2.4';
+    protected $version = '1.2.5';
 
     /**
      * Configuration
@@ -389,14 +389,15 @@ class Restserver {
     
     /**
      * Envoi une réponce au client
-     * @param array l
+     * @param mixed $data
      * @param integer|null $code
      */
-    public function response(array $data = array(), $code = NULL) {
+    public function response($data = array(), $code = NULL) {
         // Si il y a aucun data
         if (empty($data)) {
             $data = $this->protocol;
-            $code = 404;
+            $data['error'] = "Data is empty"
+            $code = 200;
         }
         
         // Si il y a pas de code HTTP
@@ -414,8 +415,16 @@ class Restserver {
             $this->CI->output->set_header("X-RestServer: v$this->version");
         }
         
+        // Si le data est du JSON
+        $json = json_encode($data);
+        
+        // Format de sortie
+        if (!empty($json)) {
+            $this->CI->output->set_content_type('json');
+        }
+        
         // Encode le data
-        $this->CI->output->set_output(json_encode($data));
+        $this->CI->output->set_output((!empty($json)) ? $json : $data);
                 
         // Si le journal est activé
         if ($this->config['log']) {
@@ -556,7 +565,7 @@ class Restserver {
      * @return array
      */
     private function _get_headers() {
-        $headers = $this->CI->input->request_headers(TRUE);        
+        $headers = $this->CI->input->request_headers(TRUE);
         return ( ! empty($headers)) ? $headers : array();
     }
     
@@ -573,7 +582,7 @@ class Restserver {
         switch ($this->method) {
             case 'post':
                 $post = $this->CI->input->post();
-                               
+                
                 // Si les données entrantes sont un POST normal
                 if (!empty($post)) {
                     break;
@@ -589,8 +598,9 @@ class Restserver {
                 ${$this->method} = @json_decode($input, TRUE);
                 
                 // Si les données sont en HTTP
-                if (empty(${$this->method}))
+                if (empty(${$this->method})) {
                     parse_str($input, ${$this->method});
+                }
         }
         
         // Renvoi les données entrantes
@@ -626,7 +636,12 @@ class Restserver {
             foreach ($this->fields as $field) {
                 if ($field instanceof Restserver_field) {
                     // Récupération des règles
-                    $rules[] = $field->get_rules();
+                    $rule = $field->get_rules();
+                    
+                    // Si il n'y a pas de règle
+                    if (!empty($rule)) {
+                        $rules[] = $field->get_rules();
+                    }
                 }
             }
         }

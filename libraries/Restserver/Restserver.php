@@ -21,7 +21,7 @@ class Restserver
      * Version
      * @var string
      */
-    protected $version = '1.3.0';
+    protected $version = '1.3.1';
 
     /**
      * Configuration
@@ -245,9 +245,11 @@ class Restserver
             
             // Si le validateur a rencontré une ou plusieurs erreurs
             if ($this->CI->form_validation->run() === FALSE) {
+                $errors = $this->CI->form_validation->error_array();
+                
                 $this->response(array(
                     'status' => FALSE,
-                    'error' => $this->CI->form_validation->error_array()
+                    'error' => (!empty($errors)) ? $errors : 'Unsupported data validation'
                 ), 403);
 
                 return FALSE;
@@ -405,7 +407,6 @@ class Restserver
         if (empty($data)) {
             $data = $this->protocol;
             $data['error'] = "Data is empty";
-            $code = 200;
         }
 
         // Si il y a pas de code HTTP

@@ -43,10 +43,9 @@ class Server extends Restserver_Controller {
     public function __construct() {
         parent::__construct();
         
-        // Configuration
         $fields = [];
         
-        // Configuration d'un champ métier
+        // Configuration d'un champ
         $fields[] = new Restserver_field([
             // Nom entrant (requis)
             'input' => 'lastname',

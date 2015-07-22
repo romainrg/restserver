@@ -44,25 +44,34 @@ class Server extends Restserver_Controller {
         parent::__construct();
         
         // Configuration
-        $fields = array();
+        $fields = [];
         
         // Configuration d'un champ métier
-        $fields[] = new Restserver_field(array(
-            'input' => 'lastname', // Nom entrant
-            'alias' => 'user.lastname|famille.pere.nom', // Modélisation interne
-            'label' => 'Nom', // Nom du champ
-            'rules' => 'required_post|alpha|min_length[2]|max_length[250]', // Les règles à appliquer
-            'comment' => // Documentation et exemples
+        $fields[] = new Restserver_field([
+            // Nom entrant
+            'input' => 'lastname',
+            
+            // Modélisation interne
+            'alias' => 'user.lastname|famille.pere.nom',
+            
+            // Nom du champ
+            'label' => 'Nom',
+            
+            // Les règles
+            'rules' => 'required_post|alpha|min_length[2]|max_length[250]',
+            
+            // Documentation
+            'comment' =>
                 "Input: lastname".PHP_EOL.
                 "Label: Nom de famille".PHP_EOL.
                 "Type: string (min 2, max 250 caractères)".PHP_EOL.
                 "Requis: POST"
-        ));
-        
+        ]);
+
         // Applique la configuration
         $this->restserver->add_field($fields);
     }
-    
+
     /**
      * Méthode POST
      */

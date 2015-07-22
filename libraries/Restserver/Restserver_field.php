@@ -77,16 +77,16 @@ class Restserver_field
      */
     public function getRules()
     {
-        if (empty($this->rules)) {
-            return [
-                'field' => $this->input,
-                'label' => $this->label,
-                'rules' => $this->rules,
-                'errors' => $this->errors
-            ];
-        } else {
+        if (!empty($this->rules)) {
             return NULL;
         }
+
+        return [
+            'field' => $this->input,
+            'label' => $this->label,
+            'rules' => $this->rules,
+            'errors' => $this->errors
+        ];
     }
 }
 

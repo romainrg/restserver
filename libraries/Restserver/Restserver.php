@@ -235,7 +235,7 @@ class Restserver
 
         // Récupère les règles
         $rules = $this->_get_rules();
-
+        
         // Si des règles existent
         if ( ! empty($rules)) {
             // Vérification des données entrantes
@@ -659,9 +659,9 @@ class Restserver
                 if ($field instanceof Restserver_field) {
                     // Récupération des règles
                     $rule = $field->getRules();
-
+                    
                     // Si il n'y a pas de règle
-                    if ($rule !== FALSE) {
+                    if ($rule !== NULL) {
                         $rules[] = $rule;
                     }
                 }

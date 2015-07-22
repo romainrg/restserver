@@ -47,7 +47,7 @@ class MY_Form_validation extends CI_Form_validation {
      * @return	CI_Form_validation
      */
     public function set_rules($field, $label = '', $rules = array(), $errors = array()) {
-        $this->$request_method = $this->CI->input->method();
+        $this->request_method = $this->CI->input->method();
         return parent::set_rules($field, $label, $rules, $errors);
     }
     

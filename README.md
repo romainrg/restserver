@@ -26,7 +26,7 @@ class MY_Controller extends CI_Controller
     }
 }
 
-require(APPPATH.'/third_party/restserver/libraries/Restserver/Restserver.php');
+require(APPPATH.'/third_party/restserver/core/Restserver_controller.php');
 ```
 
 ### Step 3 Configuration

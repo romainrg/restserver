@@ -1,102 +1,39 @@
 # Restserver
-REST Full Server for Codeigniter 2 and Codeigniter 3
+REST Full Server for Codeigniter 3
+
+## Requirements
+
+- PHP 5.4.x (Composer requirement)
+- CodeIgniter 3.0.x
 
 ## Installation
 ### Step 1 Installation by Composer
-#### Edit /composer.json
-```json
-{
-    "require": {
-        "maltyxx/restserver": "1.2.*"
-    }
-}
-```
-#### Run composer update
+#### Run composer
 ```shell
-composer update
+composer require maltyxx/restserver
 ```
 
-### Step 2 Configuration form_validation
-```txt
-https://github.com/maltyxx/form_validation
-```
-
-### Step 3 Creates files
-```txt
-/application/libraries/Restserver.php
-```
-```php
-<?php
-defined('BASEPATH') OR exit('No direct script access allowed');
-require(APPPATH.'/libraries/Restserver/Restserver.php');
-```
-```txt
-/application/core/MY_Controller.php:
-```
+### Step 2 Create files
+Create controller file in `/application/core/MY_Controller.php`.
 ```php
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-class MY_Controller extends CI_Controller {
-
+class MY_Controller extends CI_Controller
+{
     public function __construct() {
         parent::__construct();
     }
-
-    /**
-     * Optional authentification
-     * @return boolean
-     */
-    public function _auth() {
-        $username = $this->restserver->input('username');
-        $password = $this->restserver->input('password');
-        
-        if ($username == 'test' && $password == 'test') {
-            return TRUE;
-            
-        // Si il y a une erreur
-        } else {            
-            // Prépare la réponse
-            $this->restserver->response(array(
-                'status' => FALSE,
-                'error' => "Vos identifiants sont invalides"
-            ), 406);
-            
-            return FALSE;
-        }
-    }
-    
 }
 
-require(APPPATH.'/libraries/Restserver/Restserver_Controller.php');
+require(APPPATH.'/third_party/restserver/libraries/Restserver/Restserver.php');
 ```
 
-### Step 4 Configuration
-/application/config/restserver.php:
-```php
-<?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+### Step 3 Configuration
+Duplicate configuration file `./application/third_party/restserver/config/restserver.php` in `./application/config/restserver.php`.
 
-$config['restserver'] = array(
-    'allow_methods' => array('GET', 'POST', 'PUT', 'DELETE'),
-    'allow_headers' => array('authorization', 'content-type', 'x-requested-with'),
-    'allow_credentials' => FALSE,
-    'allow_origin' => FALSE,
-    'force_https' => FALSE,
-    'ajax_only' => FALSE,
-    'auth_http' => FALSE,
-    'log' => FALSE,
-    'log_driver' => 'file',
-    'log_db_name' => '', // Database only
-    'log_db_table' => '', // Database only
-    'log_file_path' => '', // File only
-    'log_file_name' => '', // File only
-    'log_extra' => FALSE
-);
-```
-
-## Examples
-/application/controllers/Server.php:
+### Step 4 Examples
+Controller file is located in `./application/controllers/Server.php`.
 ```php
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');

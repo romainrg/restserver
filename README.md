@@ -48,19 +48,19 @@ class Server extends Restserver_Controller {
         
         // Configuration d'un champ métier
         $fields[] = new Restserver_field([
-            // Nom entrant (Requis)
+            // Nom entrant (requis)
             'input' => 'lastname',
             
-            // Modélisation interne (Option)
+            // Modélisation interne (option)
             'alias' => 'user.lastname|famille.pere.nom',
             
-            // Nom du champ (Option)
+            // Nom du champ (option)
             'label' => 'Nom',
             
-            // Les règles (Option)
+            // Les règles (option)
             'rules' => 'required_post|alpha|min_length[2]|max_length[250]',
             
-            // Documentation (Option)
+            // Documentation (option)
             'comment' =>
                 "Input: lastname".PHP_EOL.
                 "Label: Nom de famille".PHP_EOL.

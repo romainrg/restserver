@@ -77,7 +77,7 @@ class Restserver_field
      */
     public function getRules()
     {
-        if (!empty($this->rules)) {
+        if (empty($this->rules)) {
             return NULL;
         }
 

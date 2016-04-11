@@ -3,7 +3,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 require(__DIR__.'/Restserver_field.php');
 
-/** 
+/**
  * Restserver (Librairie REST Serveur)
  * @author Yoann VANITOU
  * @license http://www.apache.org/licenses/LICENSE-2.0
@@ -16,7 +16,7 @@ class Restserver
      * @var object $CI
      */
     protected $CI;
-    
+
     /**
      * Version
      * @var string
@@ -42,7 +42,7 @@ class Restserver
         'log_db_table' => 'log', // Database only
         'log_file_path' => '', // File only
         'log_file_name' => 'rest.log', // File only
-        'log_extra' => FALSE 
+        'log_extra' => FALSE
     );
 
     /**
@@ -123,7 +123,7 @@ class Restserver
 
     /**
      * Les alias
-     * @var type 
+     * @var type
      */
     protected $alias = array();
 
@@ -235,24 +235,27 @@ class Restserver
 
         // Récupère les règles
         $rules = $this->_get_rules();
-        
+
         // Si des règles existent
         if ( ! empty($rules)) {
             // Vérification des données entrantes
             $this->CI->form_validation->set_data($this->input[$this->method]);
             $this->CI->form_validation->set_rules($rules);
             $this->CI->form_validation->set_error_delimiters('', '');
-            
+
             // Si le validateur a rencontré une ou plusieurs erreurs
             if ($this->CI->form_validation->run() === FALSE) {
                 $errors = $this->CI->form_validation->error_array();
-                
-                $this->response(array(
-                    'status' => FALSE,
-                    'error' => (!empty($errors)) ? $errors : 'Unsupported data validation'
-                ), 403);
 
-                return FALSE;
+                // Au cas ou le form validation renvoi false mais ne retourne aucune erreur
+                if (!empty($errors)) {
+                    $this->response(array(
+                        'status' => FALSE,
+                        'error' => (!empty($errors)) ? $errors : 'Unsupported data validation'
+                    ), 403);
+
+                    return FALSE;
+                }
             }
         }
 
@@ -392,7 +395,7 @@ class Restserver
      * @return mixed
      */
     public function delete($index = NULL, $xss_clean = FALSE)
-    {        
+    {
         return $this->_fetch_from_array('delete', $index, $xss_clean);
     }
 
@@ -541,7 +544,7 @@ class Restserver
         // Autorise une liste
         } else if (is_array($this->config['allow_origin']) && in_array($this->ip, $this->config['allow_origin'])) {
             $this->CI->output->set_header('Access-Control-Allow-Origin: '.$this->ip);
-            
+
         // Autrement seulement un host
         } else if (!empty($this->config['allow_origin'])) {
             $this->CI->output->set_header('Access-Control-Allow-Origin: '.$this->config['allow_credentials']);
@@ -659,7 +662,7 @@ class Restserver
                 if ($field instanceof Restserver_field) {
                     // Récupération des règles
                     $rule = $field->getRules();
-                    
+
                     // Si il n'y a pas de règle
                     if ($rule !== NULL) {
                         $rules[] = $rule;
